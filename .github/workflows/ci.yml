@@ -29,7 +29,7 @@ jobs:
       - run: pnpm --filter @guillxume/ui typecheck
       - run: pnpm --filter @guillxume/ui test
       - run: pnpm build:ui
-      - run: node packages/ui/scripts/check-dist.mjs
+      - run: pnpm --filter @guillxume/ui check:dist
 
   studio:
     name: Studio (lint, types, unit tests)
