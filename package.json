@@ -1,0 +1,21 @@
+{
+  "name": "datasheet-studio",
+  "private": true,
+  "description": "Datasheet Studio and the design system it is built on.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build:ui": "pnpm --filter @guillxume/ui build",
+    "dev:ui": "pnpm --filter @guillxume/ui dev",
+    "dev:studio": "pnpm --filter @guillxume/studio dev",
+    "build": "pnpm build:ui && pnpm --filter @guillxume/studio build",
+    "build-storybook": "pnpm --filter @guillxume/ui build-storybook",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.29.2"
+}

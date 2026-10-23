@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+patchedDependencies:
+  vaul@1.1.2: packages/ui/patches/vaul@1.1.2.patch
+
+onlyBuiltDependencies:
+  - esbuild
+
+ignoredBuiltDependencies:
+  - msw

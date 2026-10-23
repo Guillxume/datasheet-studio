@@ -1,0 +1,9 @@
+{
+  "default": "fiche-technique-01",
+  "rules": [
+    { "category": ["Manutention", "Transpalettes"], "template": "fiche-transpalette" },
+    { "category": ["Manutention"], "template": "fiche-manutention" },
+    { "brand": "Fabrikam", "template": "fiche-atelier" },
+    { "ref": "^ETA-", "template": "fiche-atelier" }
+  ]
+}

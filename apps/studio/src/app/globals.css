@@ -1,0 +1,60 @@
+/*
+ * FEUILLE DE L'APPLICATION — le design system partage @guillxume/ui.
+ *
+ * Tailwind, puis le theme « datasheet-studio » du package : couleurs, polices,
+ * angles et composants viennent de la. Le Studio n'ajoute ici que ce qui lui
+ * est propre : la police auto-hebergee et la protection de la feuille A4. Les
+ * jetons de la feuille et du bureau de l'editeur vivent dans editor.css.
+ *
+ * source(none) : Tailwind ne lit que src/app et src/components, pas
+ * src/blocks ni src/lib. Les blocs dessinent la fiche ; un nom de classe y
+ * qui serait aussi une utilitaire Tailwind (`grid`, `hidden`...) recevrait
+ * sinon une regle qui n'existe pas dans le PDF.
+ */
+@import "tailwindcss" source(none);
+@import "tw-animate-css";
+@import "@guillxume/ui/themes/datasheet-studio.css";
+
+@source "./";
+@source "../components";
+
+/*
+ * IBM Plex Sans, auto-hebergee (public/fonts) : le theme du package la nomme
+ * dans --font-sans, l'application fournit le fichier. Variable, avec un vrai
+ * 700 : pas de gras synthetique. Les polices du PDF (Jost) sont a part, dans
+ * la bibliotheque d'assets.
+ */
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("/fonts/ibm-plex-sans-variable.woff2") format("woff2-variations");
+}
+
+/*
+ * LA FEUILLE A4 DE L'EDITEUR NE RECOIT PAS LE SOCLE.
+ *
+ * Le canvas de Puck n'est pas isole dans une iframe : les blocs se rendent
+ * dans ce document. Le preflight de Tailwind (marges des titres et
+ * paragraphes remises a zero, listes sans puces...) et la couleur de bordure
+ * du package s'y appliqueraient, alors que le PDF n'en a aucun — l'apercu ne
+ * correspondrait plus a l'impression, ni la mesure de pagination.
+ *
+ * `revert-layer` dans la couche base annule TOUT ce que cette couche pose sur
+ * la feuille et ses descendants : on retombe sur les defauts du navigateur,
+ * comme dans Chromium au rendu. Le CSS d'impression et celui du template,
+ * hors couche, s'appliquent ensuite comme avant. Le modele de boite de la
+ * feuille elle-meme est repose dans editor.css : une regle ajoutee ici serait
+ * reordonnee AVANT celle-ci par l'optimiseur (Lightning CSS) et annulee.
+ */
+@layer base {
+  .ds-page-sheet,
+  .ds-page-sheet *,
+  .ds-page-sheet ::before,
+  .ds-page-sheet ::after,
+  .ds-page-sheet ::marker,
+  .ds-page-sheet ::placeholder {
+    all: revert-layer;
+  }
+}

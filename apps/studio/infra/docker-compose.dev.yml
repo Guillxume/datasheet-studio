@@ -1,0 +1,26 @@
+# Surcharge de DEVELOPPEMENT : Postgres, Gotenberg et Mailpit dans Docker, le
+# Studio sur l'hote (`pnpm --filter @guillxume/studio dev`). Depuis la racine :
+#
+#   docker compose -f docker-compose.yml -f apps/studio/infra/docker-compose.dev.yml up -d db gotenberg mailpit
+#
+# Les ports sont publies sur 127.0.0.1 seulement, et sur des numeros non
+# standards pour ne pas heurter un Postgres deja installe sur le poste. Ce sont
+# ceux qu'attend apps/studio/.env.dist.
+
+services:
+  db:
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"
+
+  gotenberg:
+    # `next dev` tourne SUR LE POSTE et joint Gotenberg par ce port publie.
+    # Docker ne publie pas le port d'un conteneur qui n'est que sur un reseau
+    # sans sortie (« rendu ») : il lui faut aussi « internal ». Chromium reste
+    # sans acces reseau, par sa liste d'autorisation (--chromium-allow-list).
+    networks: [rendu, internal]
+    ports:
+      - "127.0.0.1:${GOTENBERG_PORT:-3100}:3000"
+
+  mailpit:
+    ports:
+      - "127.0.0.1:${MAIL_SMTP_PORT:-1025}:1025"

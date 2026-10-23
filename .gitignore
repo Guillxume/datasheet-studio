@@ -1,0 +1,12 @@
+node_modules/
+dist/
+storybook-static/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+*.tgz
+.env
+.env.local
+.DS_Store
+.idea/
+.vscode/

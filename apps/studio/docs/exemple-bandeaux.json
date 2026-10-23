@@ -1,0 +1,296 @@
+{
+    "body": {
+        "root": {
+            "props": {
+                "padding": 0,
+                "pageWidth": 210,
+                "pageHeight": 297,
+                "marginTop": 34,
+                "marginBottom": 22,
+                "marginLeft": 0,
+                "marginRight": 0,
+                "paddingRight": 0
+            }
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "Heading",
+                "props": {
+                    "id": "heading-17",
+                    "text": "Elements poses librement sur le fond",
+                    "level": "h2",
+                    "size": 13,
+                    "align": "center",
+                    "color": "var(--color-primary)",
+                    "uppercase": false,
+                    "underline": false,
+                    "background": "",
+                    "padding": 0
+                }
+            },
+            {
+                "type": "FeatureTable",
+                "props": {
+                    "id": "featuretable-18",
+                    "source": "{{features}}",
+                    "heading": "",
+                    "nameHeader": "",
+                    "valueHeader": "",
+                    "showHeader": false,
+                    "showAbbreviation": true,
+                    "striped": true,
+                    "size": 9
+                }
+            }
+        ]
+    },
+    "header": {
+        "root": {
+            "props": {}
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "Panel",
+                "props": {
+                    "id": "panel-9",
+                    "background": "",
+                    "backgroundImage": "/assets/shared/bandeau-haut",
+                    "backgroundSize": "cover",
+                    "backgroundPosition": "center",
+                    "color": "#ffffff",
+                    "borderWidth": 0,
+                    "borderColor": "",
+                    "padding": 0,
+                    "radius": 0,
+                    "align": "left",
+                    "height": 30,
+                    "verticalAlign": "start",
+                    "content": [
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-2",
+                                "anchor": "top-left",
+                                "offsetX": 8,
+                                "offsetY": 5,
+                                "width": 26,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "Image",
+                                        "props": {
+                                            "id": "image-1",
+                                            "source": "{{shop.logo}}",
+                                            "width": 26,
+                                            "widthUnit": "mm",
+                                            "height": 0,
+                                            "align": "left",
+                                            "fit": "contain"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-4",
+                                "anchor": "middle-center",
+                                "offsetX": 0,
+                                "offsetY": -2,
+                                "width": 90,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "Text",
+                                        "props": {
+                                            "id": "text-3",
+                                            "content": "{{product.name}}",
+                                            "size": 11,
+                                            "align": "center",
+                                            "bold": true,
+                                            "color": "#ffffff",
+                                            "background": "",
+                                            "padding": 0
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-6",
+                                "anchor": "bottom-center",
+                                "offsetX": 0,
+                                "offsetY": 3,
+                                "width": 90,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "Text",
+                                        "props": {
+                                            "id": "text-5",
+                                            "content": "Ref. {{product.sku}}",
+                                            "size": 7.5,
+                                            "align": "center",
+                                            "bold": false,
+                                            "color": "#ffffff",
+                                            "background": "",
+                                            "padding": 0
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-8",
+                                "anchor": "top-right",
+                                "offsetX": 8,
+                                "offsetY": 4,
+                                "width": 0,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "QrCode",
+                                        "props": {
+                                            "id": "qrcode-7",
+                                            "content": "{{product.url}}",
+                                            "source": "",
+                                            "size": 20,
+                                            "caption": "",
+                                            "align": "right",
+                                            "dark": "#ffffff",
+                                            "light": "",
+                                            "margin": 1
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "footer": {
+        "root": {
+            "props": {}
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "Panel",
+                "props": {
+                    "id": "panel-16",
+                    "background": "",
+                    "backgroundImage": "/assets/shared/bandeau-bas",
+                    "backgroundSize": "cover",
+                    "backgroundPosition": "center",
+                    "color": "#ffffff",
+                    "borderWidth": 0,
+                    "borderColor": "",
+                    "padding": 0,
+                    "radius": 0,
+                    "align": "left",
+                    "height": 18,
+                    "verticalAlign": "start",
+                    "content": [
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-11",
+                                "anchor": "middle-left",
+                                "offsetX": 8,
+                                "offsetY": 0,
+                                "width": 70,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "Text",
+                                        "props": {
+                                            "id": "text-10",
+                                            "content": "{{shop.company.address}}",
+                                            "size": 7,
+                                            "align": "left",
+                                            "bold": false,
+                                            "color": "#ffffff",
+                                            "background": "",
+                                            "padding": 0
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-13",
+                                "anchor": "middle-center",
+                                "offsetX": 0,
+                                "offsetY": 0,
+                                "width": 40,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "BadgeRow",
+                                        "props": {
+                                            "id": "badgerow-12",
+                                            "source": "{{badges}}",
+                                            "height": 9,
+                                            "gap": 2,
+                                            "align": "center",
+                                            "background": "",
+                                            "padding": 0,
+                                            "mapping": [
+                                                {
+                                                    "badge": "ce",
+                                                    "iconUrl": "/assets/shared/conformite_europeenne",
+                                                    "label": "CE"
+                                                },
+                                                {
+                                                    "badge": "tuv",
+                                                    "iconUrl": "/assets/shared/tuv",
+                                                    "label": "TUV"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "type": "Positioned",
+                            "props": {
+                                "id": "positioned-15",
+                                "anchor": "bottom-right",
+                                "offsetX": 8,
+                                "offsetY": 2,
+                                "width": 40,
+                                "zIndex": 2,
+                                "content": [
+                                    {
+                                        "type": "PageNumber",
+                                        "props": {
+                                            "id": "pagenumber-14",
+                                            "format": "long",
+                                            "size": 7,
+                                            "align": "right",
+                                            "color": "#ffffff"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "css": null,
+    "settings": {}
+}

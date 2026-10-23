@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ui:
+    name: Design system (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @guillxume/ui lint
+      - run: pnpm --filter @guillxume/ui typecheck
+      - run: pnpm --filter @guillxume/ui test
+      - run: pnpm build:ui
+      - run: node packages/ui/scripts/check-dist.mjs
+
+  studio:
+    name: Studio (lint, types, unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # The Studio imports the design system from its dist/ build.
+      - run: pnpm build:ui
+      - run: pnpm --filter @guillxume/studio lint
+      - run: pnpm --filter @guillxume/studio typecheck
+      - run: pnpm --filter @guillxume/studio test
+
+  integration:
+    name: Studio (migrations, SQL integration tests)
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: studio_ci
+          POSTGRES_USER: studio_ci
+          POSTGRES_PASSWORD: studio_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U studio_ci -d studio_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://studio_ci:studio_ci@127.0.0.1:5432/studio_ci
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:ui
+      - name: Install qpdf
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq qpdf
+      - name: Apply migrations
+        run: pnpm --filter @guillxume/studio migrate
+      - name: Re-apply migrations (must be a no-op)
+        run: |
+          out=$(pnpm --filter @guillxume/studio migrate)
+          echo "$out"
+          echo "$out" | grep -q "schema deja a jour"
+      - run: pnpm --filter @guillxume/studio test:integration
+
+  image:
+    name: Docker image (the `docker compose up` demo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the app and tools targets
+        run: |
+          docker buildx build --target app -f apps/studio/infra/config/app/Dockerfile .
+          docker buildx build --target tools -f apps/studio/infra/config/app/Dockerfile .

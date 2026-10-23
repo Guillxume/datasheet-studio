@@ -1,0 +1,102 @@
+/*
+ * Neutral theme — the default for tools without a brand of their own.
+ *
+ * Colors are shadcn/ui's "neutral" base color (https://ui.shadcn.com/r/colors/neutral.json).
+ * Radius, fonts and light --destructive-foreground are the same as in the
+ * other themes, so every theme defines the same set of tokens.
+ *
+ * Adjusted from shadcn's values to meet WCAG 2 AA contrast:
+ *   light --muted-foreground  0.556 → 0.54  (text on --muted, 4.5:1)
+ *   light --ring              0.708 → 0.66  (focus ring on --background, 3:1)
+ *   dark  --destructive       0.704 → 0.68  (white on bg-destructive/80, 4.5:1)
+ *   dark  --destructive-foreground  near-black instead of white (on solid
+ *         --destructive, white cannot reach 4.5:1)
+ *
+ * Chart colors are not shadcn's greys, which cannot tell series apart: they
+ * are slots 1-5 of a categorical palette validated for colour-vision
+ * deficiencies on this theme's light (#ffffff) and dark (#0a0a0a)
+ * backgrounds. In light mode, chart-3 to chart-5 are under 3:1 against the
+ * background: charts using them must show a legend or direct labels.
+ */
+
+@import "../styles/base.css";
+
+:root,
+.light {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.54 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.66 0 0);
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+  --radius: 0.5rem;
+  --font-sans:
+    "Geist", "Geist Fallback", ui-sans-serif, system-ui, -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif:
+    "Geist", "Geist Fallback", ui-serif, "Georgia", "Cambria",
+    "Times New Roman", "Times", serif;
+  --font-mono:
+    "Geist Mono", "Geist Mono Fallback", ui-monospace, "SFMono-Regular",
+    "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", monospace;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --destructive: oklch(0.68 0.191 22.216);
+  --destructive-foreground: oklch(0.145 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}

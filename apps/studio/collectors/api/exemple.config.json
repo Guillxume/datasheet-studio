@@ -1,0 +1,72 @@
+{
+  "name": "pim-interne",
+  "base_url": "https://pim.exemple.fr/api/v1",
+
+  "auth": { "type": "bearer", "token_env": "PIM_TOKEN" },
+  "headers": { "accept-language": "fr" },
+  "rate_limit_ms": 200,
+
+  "list": {
+    "path": "/produits",
+    "query": { "statut": "actif" },
+    "items": "data",
+    "pagination": {
+      "type": "page",
+      "param": "page",
+      "size_param": "par_page",
+      "size": 100,
+      "start": 1,
+      "total": "meta.total"
+    }
+  },
+
+  "detail": {
+    "path": "/produits/{id}",
+    "id": "id",
+    "item": "data"
+  },
+
+  "ref": "reference",
+  "fingerprint": "updated_at",
+  "template_from": "_list.famille.template_fiche",
+
+  "shop": {
+    "name": "Contoso Equipment",
+    "url": "https://www.contoso-equipment.example",
+    "colors": { "primary": "#0b5ea8", "secondary": "#33404d" }
+  },
+
+  "map": {
+    "product.id": "id",
+    "product.name": "libelle",
+    "product.sku": "reference",
+    "product.gtin": "ean13",
+    "product.mpn": "reference_fabricant",
+    "product.brand": "marque.nom",
+    "product.url": "url_publique",
+    "product.category_path": "familles[].libelle",
+
+    "product.price.amount": "tarifs.public_ht | minor",
+    "product.price.currency": "tarifs.devise | default:EUR",
+    "product.price.tax_included": "tarifs.ttc | bool",
+
+    "product.description_short": "accroche | trim",
+    "product.description_html": "description | nl2html",
+
+    "images[].src": "medias[].url",
+    "images[].legend": "medias[].legende",
+    "schema_image.src": "schema_cote.url",
+
+    "features[].name": "caracteristiques[].libelle",
+    "features[].value": "caracteristiques[].valeur | string",
+    "features[].abbreviation": "caracteristiques[].lettre",
+    "features[].group": "caracteristiques[].groupe",
+
+    "badges": "labels[].code",
+
+    "custom.famille_code": "famille.code",
+    "custom.delai_reappro": "logistique.delai_jours | string"
+  },
+
+  "download_images": false
+}

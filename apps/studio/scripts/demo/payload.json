@@ -1,0 +1,113 @@
+{
+  "template": "fiche-produit-simple",
+  "version": "published",
+  "locale": "fr",
+  "data": {
+    "shop": {
+      "name": "Contoso Equipment",
+      "url": "https://contoso-equipment.example",
+      "logo": "asset://logo",
+      "colors": {
+        "primary": "#0b5ea8",
+        "secondary": "#33404d"
+      },
+      "company": {
+        "address": "1 Example Street, 51000 Springfield",
+        "phone": "+33 1 00 00 00 00",
+        "email": "contact@contoso-equipment.example"
+      }
+    },
+    "product": {
+      "id": 1001,
+      "name": "Rayonnage métallique 5 niveaux",
+      "sku": "CE-RAY-1809",
+      "supplier_skus": [
+        "FR-1809-G"
+      ],
+      "brand": "Contoso Pro",
+      "category_path": [
+        "Stockage",
+        "Rayonnages"
+      ],
+      "url": "https://contoso-equipment.example/rayonnage-metallique-5-niveaux",
+      "datasheet_url": "https://contoso-equipment.example/fiche-technique/rayonnage-metallique-5-niveaux.pdf",
+      "price": {
+        "amount": "149,00",
+        "currency": "EUR",
+        "tax_included": false
+      },
+      "description_short": "Rayonnage galvanisé à monter sans outil : cinq tablettes réglables tous les 25 mm, 150 kg par niveau.",
+      "description_html": "<p>Montants perforés et tablettes à emboîter : le rayonnage se monte <strong>sans boulon</strong> en une dizaine de minutes.</p><ul><li>Tablettes réglables au pas de 25 mm</li><li>Acier galvanisé, adapté aux locaux humides</li><li>Patins de protection du sol fournis</li></ul>"
+    },
+    "features": [
+      {
+        "name": "Hauteur",
+        "value": "1800 mm",
+        "abbreviation": "H"
+      },
+      {
+        "name": "Largeur",
+        "value": "900 mm",
+        "abbreviation": "L"
+      },
+      {
+        "name": "Profondeur",
+        "value": "400 mm",
+        "abbreviation": "P"
+      },
+      {
+        "name": "Nombre de niveaux",
+        "value": "5"
+      },
+      {
+        "name": "Charge par niveau",
+        "value": "150 kg"
+      },
+      {
+        "name": "Charge totale",
+        "value": "750 kg"
+      },
+      {
+        "name": "Finition",
+        "value": "Acier galvanisé"
+      },
+      {
+        "name": "Poids net",
+        "value": "32 kg"
+      }
+    ],
+    "images": [
+      {
+        "src": "asset://img-0",
+        "legend": "Rayonnage chargé"
+      },
+      {
+        "src": "asset://img-1",
+        "legend": "Tablette emboîtée dans le montant"
+      }
+    ],
+    "schema_image": {
+      "src": "asset://schema"
+    },
+    "badges": [
+      "garantie:5",
+      "montage:a-monter"
+    ],
+    "finishes": [
+      {
+        "label": "Finition",
+        "options": [
+          {
+            "label": "Galvanisé",
+            "color": "#b8c0c8"
+          },
+          {
+            "label": "Bleu",
+            "color": "#2b5ca8",
+            "note": "RAL 5010"
+          }
+        ]
+      }
+    ]
+  }
+}

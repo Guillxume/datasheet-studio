@@ -1,0 +1,25 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "extends": ["@bekaert-dev/biome-config"],
+  "files": {
+    "includes": ["**", "!**/dist", "!**/storybook-static"]
+  },
+  "css": {
+    "parser": {
+      "cssModules": true,
+      "tailwindDirectives": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/components/table.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noNoninteractiveTabindex": "off"
+          }
+        }
+      }
+    }
+  ]
+}

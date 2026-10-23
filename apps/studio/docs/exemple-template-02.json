@@ -1,0 +1,288 @@
+{
+    "body": {
+        "root": {
+            "props": {
+                "padding": 10,
+                "pageWidth": 210,
+                "pageHeight": 297,
+                "marginTop": 32,
+                "marginBottom": 22,
+                "marginLeft": 0,
+                "marginRight": 0
+            }
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "Heading",
+                "props": {
+                    "id": "heading-1",
+                    "text": "{{product.name}}",
+                    "level": "h1",
+                    "size": 20,
+                    "align": "center",
+                    "color": "#111111",
+                    "uppercase": true,
+                    "underline": true,
+                    "background": "",
+                    "padding": 0
+                }
+            },
+            {
+                "type": "BadgeRow",
+                "props": {
+                    "id": "badgerow-2",
+                    "source": "{{badges}}",
+                    "height": 18,
+                    "gap": 4,
+                    "align": "center",
+                    "background": "",
+                    "padding": 0,
+                    "mapping": [
+                        {
+                            "badge": "carsat",
+                            "iconUrl": "/assets/shared/carsat",
+                            "label": "CARSAT"
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "Spacer",
+                "props": {
+                    "id": "spacer-3",
+                    "height": 3
+                }
+            },
+            {
+                "type": "Columns",
+                "props": {
+                    "id": "columns-13",
+                    "ratio": "1fr 1.5fr 0.75fr",
+                    "gap": 4,
+                    "align": "start",
+                    "left": [
+                        {
+                            "type": "ImageGallery",
+                            "props": {
+                                "id": "imagegallery-4",
+                                "source": "{{images}}",
+                                "skip": 1,
+                                "limit": 4,
+                                "columns": 2,
+                                "gap": 2,
+                                "border": true,
+                                "borderColor": "var(--color-primary)",
+                                "borderWidth": 1,
+                                "padding": 1
+                            }
+                        }
+                    ],
+                    "right": [
+                        {
+                            "type": "ImageGallery",
+                            "props": {
+                                "id": "imagegallery-5",
+                                "source": "{{images}}",
+                                "skip": 0,
+                                "limit": 1,
+                                "columns": 1,
+                                "gap": 0,
+                                "border": false
+                            }
+                        }
+                    ],
+                    "third": [
+                        {
+                            "type": "Panel",
+                            "props": {
+                                "id": "panel-12",
+                                "background": "var(--color-primary)",
+                                "color": "#ffffff",
+                                "borderWidth": 0,
+                                "borderColor": "",
+                                "padding": 2,
+                                "radius": 0,
+                                "align": "center",
+                                "content": [
+                                    {
+                                        "type": "Text",
+                                        "props": {
+                                            "id": "text-6",
+                                            "content": "Produit en ligne",
+                                            "size": 8,
+                                            "align": "center",
+                                            "bold": false,
+                                            "color": "#ffffff",
+                                            "background": "",
+                                            "padding": 0
+                                        }
+                                    },
+                                    {
+                                        "type": "QrCode",
+                                        "props": {
+                                            "id": "qrcode-7",
+                                            "content": "{{product.url}}",
+                                            "source": "",
+                                            "size": 18,
+                                            "caption": "",
+                                            "align": "center",
+                                            "dark": "#ffffff",
+                                            "light": "",
+                                            "margin": 1
+                                        }
+                                    },
+                                    {
+                                        "type": "Spacer",
+                                        "props": {
+                                            "id": "spacer-8",
+                                            "height": 2
+                                        }
+                                    },
+                                    {
+                                        "type": "BadgeRow",
+                                        "props": {
+                                            "id": "badgerow-9",
+                                            "source": "{{badges}}",
+                                            "height": 14,
+                                            "gap": 2,
+                                            "align": "center",
+                                            "background": "",
+                                            "padding": 0,
+                                            "mapping": [
+                                                {
+                                                    "badge": "garantie:3-ans",
+                                                    "iconUrl": "/assets/shared/garantie-3-ans",
+                                                    "label": "Garantie 3 ans"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "Spacer",
+                                        "props": {
+                                            "id": "spacer-10",
+                                            "height": 2
+                                        }
+                                    },
+                                    {
+                                        "type": "BadgeRow",
+                                        "props": {
+                                            "id": "badgerow-11",
+                                            "source": "{{badges}}",
+                                            "height": 14,
+                                            "gap": 2,
+                                            "align": "center",
+                                            "background": "",
+                                            "padding": 0,
+                                            "mapping": [
+                                                {
+                                                    "badge": "ce",
+                                                    "iconUrl": "/assets/shared/certificat",
+                                                    "label": "Certificat"
+                                                },
+                                                {
+                                                    "badge": "tuv",
+                                                    "iconUrl": "/assets/shared/manuel",
+                                                    "label": "Manuel"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "Spacer",
+                "props": {
+                    "id": "spacer-14",
+                    "height": 4
+                }
+            },
+            {
+                "type": "Columns",
+                "props": {
+                    "id": "columns-17",
+                    "ratio": "1fr 1fr",
+                    "gap": 5,
+                    "align": "start",
+                    "left": [
+                        {
+                            "type": "FeatureTable",
+                            "props": {
+                                "id": "featuretable-15",
+                                "source": "{{features}}",
+                                "heading": "",
+                                "nameHeader": "",
+                                "valueHeader": "",
+                                "showHeader": false,
+                                "showAbbreviation": true,
+                                "striped": true,
+                                "size": 9
+                            }
+                        }
+                    ],
+                    "right": [
+                        {
+                            "type": "SchemaImage",
+                            "props": {
+                                "id": "schemaimage-16",
+                                "source": "{{schema_image.src}}",
+                                "width": 100,
+                                "align": "center"
+                            }
+                        }
+                    ],
+                    "third": []
+                }
+            }
+        ]
+    },
+    "header": {
+        "root": {
+            "props": {}
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "PageHeader",
+                "props": {
+                    "id": "pageheader-18",
+                    "title": "{{product.name}}",
+                    "subtitle": "Ref. {{product.sku}}",
+                    "logoUrl": "{{shop.logo}}",
+                    "logoHeight": 11,
+                    "backgroundUrl": "",
+                    "backgroundColor": "var(--color-primary)",
+                    "textColor": "#ffffff",
+                    "height": 26
+                }
+            }
+        ]
+    },
+    "footer": {
+        "root": {
+            "props": {}
+        },
+        "zones": {},
+        "content": [
+            {
+                "type": "PageFooter",
+                "props": {
+                    "id": "pagefooter-19",
+                    "left": "{{shop.company.address}}",
+                    "center": "{{shop.company.phone}} - {{shop.company.email}}",
+                    "backgroundColor": "var(--color-secondary)",
+                    "textColor": "#ffffff",
+                    "height": 16,
+                    "showPageNumbers": true
+                }
+            }
+        ]
+    },
+    "css": null,
+    "settings": {}
+}

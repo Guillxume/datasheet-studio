@@ -1,0 +1,27 @@
+{
+  "//": "Export produits PrestaShop (BO > Produits > Exporter). A utiliser avec --list-sep , et --where \"Actif (0/1)=1\".",
+
+  "ID": "ref",
+  "Nom": "product.name",
+  "Reference": "product.sku",
+  "EAN13": "product.gtin",
+  "MPN": "product.mpn",
+  "Fabricant": "product.brand",
+  "URL reecrite": "custom.url_reecrite",
+
+  "Prix HT": "product.price.amount",
+  "Categories (x,y,z)": "product.category_path",
+
+  "Resume": "product.description_short | html2text",
+  "Description": "product.description_html",
+
+  "Image URLs (x,y,z)": "images",
+  "Caracteristiques (Nom:Valeur:Position)": "features",
+
+  "Poids": "custom.poids",
+  "Largeur": "custom.largeur",
+  "Hauteur": "custom.hauteur",
+  "Profondeur": "custom.profondeur",
+  "Quantite": "custom.quantite",
+  "Date de creation": "custom.date_creation"
+}

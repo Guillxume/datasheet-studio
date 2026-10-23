@@ -1,0 +1,892 @@
+/*
+ * EDITEUR — ce qui reste ici, et pourquoi.
+ *
+ * Le chrome de l'editeur (barre, onglets, reglages, panneaux, dock d'apercu)
+ * vient desormais du design system partage @guillxume/ui et des
+ * utilitaires Tailwind poses dans EditorClient.tsx et panels.tsx. Ce fichier
+ * ne garde que ce qu'aucun composant ne peut porter :
+ *
+ *  1. le branchement des jetons de Puck sur ceux du theme (Puck dessine sa
+ *     propre interface : palette, panneau de champs, Outline) ;
+ *  2. les jetons FIXES de la feuille (--sheet-*) et du bureau (--desk) ;
+ *  3. tout ce qui se dessine dans le canvas : enveloppes de Puck, pile des
+ *     pages, feuille, bandes, reperes. Le canvas doit rendre EXACTEMENT comme
+ *     le PDF : rien de ce qui suit le point 2 n'est une affaire de theme.
+ */
+
+/* ======================================================================= */
+/* Panneaux de Puck (palette de glisser-deposer, panneau de champs, Outline) */
+/*                                                                          */
+/* Puck expose ses couleurs par variables CSS semantiques, dans son propre   */
+/* @layer ("puck-tokens", visible dans @puckeditor/core/dist/index.css) —    */
+/* c'est une surface de theming publique, pas un detail d'implementation.    */
+/* Une regle HORS @layer l'emporte toujours sur une regle dans un @layer,    */
+/* quelle que soit sa specificite (cascade CSS) : pas besoin de !important.  */
+/*                                                                          */
+/* Le mapping n'a pas de branche de theme : chacune de ses valeurs est un    */
+/* jeton du theme « datasheet-studio » du package, qui bascule DEJA entre    */
+/* :root et .dark (--card, --foreground, --border, --primary...). Un @media  */
+/* n'aurait pas suffi de toute facon, puisque le theme peut etre choisi a la */
+/* main contre celui du systeme.                                             */
+/*                                                                          */
+/* ----------------------------------------------------------------------- */
+/* DEUX REGRESSIONS CORRIGEES ICI. Les deux venaient de la meme erreur :     */
+/* avoir surcharge un jeton SEMANTIQUE sans lire les regles qui le           */
+/* consomment. Un jeton de Puck sert souvent a deux endroits aux exigences   */
+/* opposees ; c'est le fichier index.css livre qui le dit, pas son nom.      */
+/*                                                                          */
+/* 1. LE CALQUE DE SURVOL DU CANVAS ETAIT DEVENU OPAQUE.                     */
+/*    `._DraggableComponent--hover > ... > overlay` peint son fond avec      */
+/*    --puck-color-selection-bg. La valeur d'usine est                       */
+/*    `color-mix(in srgb, azure-09 30%, transparent)` : TRANSLUCIDE, elle    */
+/*    teinte le bloc survole. La remplacer par un melange sur la surface     */
+/*    d'interface la rendait OPAQUE : le bloc disparaissait sous un aplat.   */
+/*    En theme sombre l'aplat valait #37281c, soit 14,16:1 contre le papier  */
+/*    blanc — un rectangle quasi noir pose sur la feuille.                   */
+/*                                                                          */
+/*    Correction de fond : tout ce qui peint SUR LA FEUILLE passe par les    */
+/*    jetons --sheet-*, qui sont fixes. C'est la regle des deux surfaces :   */
+/*    --card bascule, la feuille non. Et la transparence est conservee,      */
+/*    parce qu'un calque de survol doit laisser voir ce qu'il survole.       */
+/*                                                                          */
+/* 2. LE TEXTE AU SURVOL DE LA PALETTE ETAIT ILLISIBLE.                      */
+/*    `._DrawerItem-draggable:hover` pose --puck-color-interactive en        */
+/*    COULEUR DE TEXTE sur un fond --puck-color-interactive-soft-hover.      */
+/*    --puck-color-interactive avait recu une teinte fixe (elle devait       */
+/*    supporter du blanc dans les deux themes, pour le bouton primaire) :    */
+/*    en theme sombre, cela donnait du brun #b04b1b sur du brun #3f2c1e,     */
+/*    soit 2,43:1 — sous le seuil de 4,5:1 du texte courant, WCAG 2 niveau   */
+/*    AA. En clair : 4,30:1, egalement en echec.                             */
+/*                                                                          */
+/*    Correction de fond : --puck-color-interactive pointe sur --primary,    */
+/*    qui bascule — donc lisible en TEXTE dans les deux themes. Le bouton    */
+/*    primaire, qui avait impose la valeur fixe, est traite a part par ses   */
+/*    propres crochets --puck-button-primary-* : il n'y a plus un seul jeton */
+/*    a qui l'on demande deux choses contraires.                             */
+/* ----------------------------------------------------------------------- */
+/*                                                                          */
+/* VERIFIE (formule de luminance relative, WCAG 2 niveau AA), en clair PUIS  */
+/* en sombre. Mesures faites sur les anciens jetons du Studio, dont le theme */
+/* du package reprend les valeurs a l'identique (--card #fff / #1f1c16,      */
+/* --foreground #2e2b25 / #f2efea, --muted-foreground #6b6355 / #b3a998,     */
+/* --primary #a8481a / #e8834a, --primary-foreground #fff / #16140f) :       */
+/*  - --foreground sur --card : 14,11:1 et 14,81:1 ; --muted-foreground sur  */
+/*    --card : 5,93:1 et 7,32:1 — au-dessus du seuil de 4,5:1 (1.4.3).       */
+/*  - --primary EN TEXTE sur chacun des quatre fonds de survol : 5,02 a      */
+/*    5,42:1. C'est la contrainte oubliee au tour precedent, et c'est elle   */
+/*    qui a fixe les pourcentages : 16 % tombait a 4,61:1 en clair.          */
+/*  - --muted-foreground sur ces memes fonds : 5,11 a 6,72:1.                */
+/*  - chaque fond de survol reste distinct de --card : 1,09 a 1,24:1,        */
+/*    comparable a l'ecart que Puck se donne en theme clair (1,05 a 1,17:1,  */
+/*    mesure dans le CSS livre).                                             */
+/*  - bouton primaire : --primary-foreground sur --primary 5,82:1 et 6,82:1 ;*/
+/*    au survol 6,52:1 et 7,55:1 ; le fond se detache de --card a 5,82:1 et  */
+/*    6,29:1, au-dessus du seuil de 3:1 des composants (1.4.11).             */
+/*                                                                          */
+/* NON TOUCHE, VOLONTAIREMENT : surface-inverse / text-inverse /             */
+/* border-inverse. Ce trio habille un chip FIXE (barre d'action flottante    */
+/* au-dessus d'un bloc selectionne, bouton plein ecran) et n'a pas a suivre  */
+/* le theme ambiant.                                                        */
+/* ======================================================================= */
+.ed {
+  --puck-color-surface: var(--card);
+  --puck-color-surface-muted: var(--background);
+  --puck-color-surface-subtle: var(--background);
+  --puck-color-border: var(--border);
+  --puck-color-border-hover: var(--muted-foreground);
+  --puck-color-border-muted: var(--border);
+  --puck-color-text: var(--foreground);
+  --puck-color-text-secondary: var(--muted-foreground);
+  --puck-color-text-muted: var(--muted-foreground);
+  --puck-color-text-subtle: var(--muted-foreground);
+  --puck-color-bg-disabled: var(--background);
+  --puck-color-text-disabled: var(--muted-foreground);
+
+  /*
+   * --puck-color-interactive est lu comme COULEUR DE TEXTE (survol de la
+   * palette, item de tableau deplie, icone de bouton-icone, entree active de
+   * la barre de plugins). Il doit donc basculer.
+   */
+  --puck-color-interactive: var(--primary);
+  --puck-color-focus-ring: var(--primary);
+  --puck-color-highlight: var(--primary);
+
+  /*
+   * Le bouton primaire de Puck est le SEUL usage ou l'accent sert de fond
+   * plein. Il a ses propres crochets : on peut donc lui donner le couple
+   * --primary / --primary-foreground sans contraindre le jeton semantique
+   * ci-dessus.
+   *
+   * Le survol melange vers --foreground et non vers `black` : en clair le
+   * texte est sombre, donc le fond fonce ; en sombre il est clair, donc le
+   * fond eclaircit. Une seule ecriture, le bon sens dans les deux themes —
+   * alors qu'un melange vers `black` aurait rapproche le fond du texte en
+   * sombre.
+   */
+  --puck-button-primary-color-bg: var(--primary);
+  --puck-button-primary-color-text: var(--primary-foreground);
+  --puck-button-primary-color-bg-hover: color-mix(in srgb, var(--primary) 88%, var(--foreground));
+  --puck-button-primary-color-bg-active: color-mix(in srgb, var(--primary) 78%, var(--foreground));
+
+  /* Fonds de survol et de selection — pourcentages fixes par la mesure. */
+  --puck-color-interactive-soft: color-mix(in srgb, var(--primary) 6%, var(--card));
+  --puck-color-interactive-subtle: color-mix(in srgb, var(--primary) 8%, var(--card));
+  --puck-color-interactive-soft-hover: color-mix(in srgb, var(--primary) 10%, var(--card));
+  --puck-color-interactive-neutral-hover: color-mix(in srgb, var(--foreground) 8%, var(--card));
+
+  /*
+   * CE QUI PEINT SUR LA FEUILLE — jetons FIXES et TRANSLUCIDES.
+   *
+   * Ces calques se posent sur la surface de page, qui est du papier blanc dans
+   * les deux themes. Les faire dependre de --card ou de --primary est l'erreur
+   * corrigee plus haut. --sheet-tag est deja la couleur des reperes d'edition
+   * poses sur le papier (etiquettes de conteneur, saut de page) : le calque de
+   * survol appartient a la meme famille.
+   *
+   * La transparence n'est pas un effet : un calque qui masque le bloc qu'il
+   * survole empeche de juger ce qu'on manipule.
+   */
+  --puck-slot-color-bg: color-mix(in srgb, var(--sheet-tag) 10%, transparent);
+  --puck-slot-color-border: var(--sheet-tag);
+  --puck-slot-component-color-overlay: color-mix(in srgb, var(--sheet-tag) 16%, transparent);
+  --puck-slot-component-color-overlay-border: var(--sheet-tag);
+  --puck-slot-component-color-border-selected: var(--sheet-tag);
+  --puck-slot-component-color-border-dragging: var(--sheet-tag);
+
+  /* Valeurs de repli des deux precedentes, alignees pour la meme raison. */
+  --puck-color-selection-bg: color-mix(in srgb, var(--sheet-tag) 16%, transparent);
+  --puck-color-selection-border: var(--sheet-tag);
+
+  /*
+   * RAYONS — meme mecanisme que les couleurs ci-dessus : une surface de
+   * theming publique (@puckeditor/core/dist/index.css declare --puck-radius-xs
+   * a -round hors @layer), pas un detail d'implementation a contourner.
+   *
+   * Le territoire est anguleux : le theme pose --radius a 0. Sans cette
+   * surcharge, la palette de blocs et les champs du panneau de droite
+   * gardaient les coins arrondis de Puck — visible a l'ecran dans les deux
+   * themes, jamais corrige parce que --puck-color-* masque le probleme de
+   * couleur mais ne dit rien des rayons.
+   *
+   * --puck-radius-pill et --puck-radius-round NE SONT PAS touches : ce sont
+   * de vraies pastilles et de vrais cercles, l'exception que le systeme
+   * autorise deja (rounded-full).
+   */
+  --puck-radius-xs: var(--radius);
+  --puck-radius-s: var(--radius);
+  --puck-radius-m: var(--radius);
+  --puck-radius-l: var(--radius);
+}
+
+/*
+ * Indicateur de focus du canvas et des panneaux de Puck.
+ *
+ * Les composants du package portent leur propre anneau ; Puck et les reperes
+ * poses sur la feuille (boutons Dupliquer/Supprimer des etiquettes) n'en ont
+ * pas. `:focus-visible` et non `:focus` — l'anneau n'apparait qu'au clavier,
+ * la ou il sert. --ring est l'accent du theme : 5,17:1 en clair et 7,37:1 en
+ * sombre contre le fond, au-dessus du seuil de 3:1 des elements non textuels
+ * (WCAG 2 niveau AA, critere 1.4.11). Le decalage evite que l'anneau ne soit
+ * avale par la bordure du controle.
+ */
+.ed-canvas :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ======================================================================= */
+/* Jetons de la feuille et du bureau.                                       */
+/* ======================================================================= */
+
+:root {
+  /*
+   * LE BUREAU — le plan sur lequel la feuille est posee, dans le canvas.
+   *
+   * Il n'est PAS la feuille : c'est du mobilier, donc de l'interface, donc il
+   * suit le theme (variante sombre ci-dessous). La feuille, elle, reste
+   * blanche. Le bureau existe pour que le blanc du papier se detache — mesure :
+   * la feuille ressortait a 1,13:1 sur l'ancien gris bleute #eef1f5, elle
+   * ressort a 1,31:1 en clair et 18,40:1 en sombre.
+   */
+  --desk: #e6e0d8;
+
+  /*
+   * Surface de page du canvas — VALEURS FIXES, sans variante sombre.
+   *
+   * Elles se lisent toujours sur du blanc. Les inverser avec le theme les
+   * rendrait illisibles sur la page, qui, elle, ne s'inverse pas.
+   *
+   * FIXE ne veut pas dire FROID : --sheet-guide passe d'un gris bleu (#8296b0)
+   * au gris chaud de la rampe, a contraste egal (3,03 puis 3,01:1 sur blanc).
+   * Il reste hors theme, il cesse simplement d'etre la seule note froide de
+   * l'interface. --sheet-mark et --sheet-tag ne bougent PAS, et pour deux
+   * raisons distinctes : le rouge est une convention de repere d'impression, et
+   * le bleu doit rester etranger a la terre cuite de l'application pour qu'une
+   * etiquette posee sur le papier ne se confonde pas avec une commande.
+   */
+  --sheet-guide: #9b9486; /* 3,01:1 sur blanc — trait, element graphique */
+  --sheet-mark: #e11d48; /* 4,70:1 sur blanc — reperes d'impression */
+  --sheet-tag: #2b78ca; /* 4,52:1 avec du blanc dessus — etiquettes */
+
+  /*
+   * Bloc « Composant » pose sur la feuille : la terre cuite du theme CLAIR,
+   * figee. L'accent du theme bascule (#e8834a en sombre) ; la feuille non.
+   * 5,82:1 avec du blanc dessus.
+   */
+  --sheet-component: #a8481a;
+
+  /*
+   * Zones reservees sur la feuille (bande d'un bandeau repete, rappel du corps).
+   * Elles sont sur la feuille, donc fixes elles aussi.
+   *
+   * DEUX CORRECTIONS ici, trouvees en mesurant le rendu et non la feuille :
+   *  - le libelle de la bande valait #64748b sur la hachure la plus sombre, soit
+   *    4,35:1 — sous le seuil de 4,5:1 du texte courant (WCAG 2 niveau AA) ;
+   *  - le rappel du corps valait #a2adbb sur #f8fafc, soit 2,17:1.
+   * Les valeurs ci-dessous sont resolues contre le fond REEL.
+   */
+  --sheet-band-a: #f5f2ec;
+  --sheet-band-b: #e9e3d8; /* la plus sombre des deux : le cas defavorable */
+  --sheet-band-ink: #6d6454; /* 4,57:1 sur --sheet-band-b, 5,22:1 sur --sheet-band-a */
+  --sheet-rest: #f7f4ee;
+  --sheet-rest-ink: #796f5d; /* 4,51:1 sur --sheet-rest — valait 2,17:1 */
+}
+
+/* Le bureau suit le theme ; la feuille et ses reperes, jamais. */
+.dark {
+  --desk: #16140f;
+}
+
+/* ======================================================================= */
+/* Ce que Puck intercale entre la page et nos blocs.                        */
+/*                                                                          */
+/* MESURE, sur un editeur Puck reel monte pour l'occasion (meme version que  */
+/* le projet, iframe desactivee) :                                          */
+/*                                                                          */
+/*   #contenu               flex column   h=918px   <- notre conteneur      */
+/*     [data-puck-dropzone]   block        h= 18px   <- insere par Puck      */
+/*       [data-puck-component]  block      h= 18px   <- insere par Puck      */
+/*         bloc (flex-grow:1)              h= 18px   <- ne grandit pas       */
+/*                                                                          */
+/* Le chemin PDF n'a aucune de ces deux enveloppes : les blocs y sont les    */
+/* items directs du conteneur. C'est de la que vient la divergence, et le    */
+/* partage du registry ne pouvait pas l'empecher — elle ne vient pas de nos  */
+/* composants mais de ce que l'editeur ajoute autour.                        */
+/*                                                                          */
+/* DEUX SYMPTOMES, dont un seul avait ete signale :                          */
+/*  1. un bloc « Etirer sur toute la hauteur » ne s'etire pas ;              */
+/*  2. l'espacement entre blocs ne s'applique pas — ecart mesure 0 px alors  */
+/*     que blockGap vaut 4 mm par defaut. L'editeur montrait donc des blocs  */
+/*     colles que le PDF espacait.                                          */
+/* ======================================================================= */
+
+/*
+ * La zone de depot RELAIE la mise en page de son parent.
+ *
+ * `gap: inherit` plutot qu'une valeur ecrite ici : le parent porte deja la
+ * bonne — blockGap pour le corps, contentGap dans un slot de conteneur. La
+ * recopier introduirait une seconde source de verite pour la meme distance.
+ */
+.ed [data-puck-dropzone] {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+/*
+ * L'enveloppe d'un bloc relaie l'espacement, elle aussi.
+ *
+ * Sans effet sur elle-meme (elle n'est pas un conteneur flex), mais c'est par
+ * elle que `gap: inherit` atteint un bloc qui reprend l'espacement de sa zone :
+ * le Groupe sans espacement saisi, le contenu d'un Composant. Dans le PDF, ou
+ * l'enveloppe n'existe pas, ces blocs sont les enfants directs de la zone.
+ */
+.ed [data-puck-component] {
+  gap: inherit;
+}
+
+/*
+ * L'etirement ne traverse les enveloppes QUE sous un bloc qui le demande.
+ *
+ * Sans le :has(), il faudrait faire grandir toutes les enveloppes, et le
+ * moindre bloc occuperait alors la page entiere. Le marqueur `data-ds-fill`
+ * est pose par src/blocks/registry.tsx sur Colonnes et Panneau.
+ *
+ * `:has()` est deja employe par le CSS livre de @puckeditor/core : la regle
+ * n'introduit donc pas d'exigence de navigateur que l'editeur n'a pas deja.
+ */
+.ed [data-puck-dropzone]:has(> [data-puck-component] > [data-ds-fill]),
+.ed [data-puck-component]:has(> [data-ds-fill]) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  /* Sans min-height:0, un enfant au contenu long refuse de retrecir et deborde
+     au lieu de se paginer. */
+  min-height: 0;
+}
+
+/*
+ * LA ZONE DE DEPOT D'UNE PAGE COUVRE TOUTE LA PAGE, pas seulement ses blocs.
+ *
+ * Retour utilisateur : « impossible de poser un element SOUS des Colonnes, il
+ * finit toujours dans une des colonnes ». Mesure sur un Puck reel, page de
+ * 994 px : sa zone de depot s'arretait a 816 px, au ras du bas du dernier bloc.
+ * Le blanc en dessous n'appartenait donc qu'a la zone RACINE du corps — un depot
+ * y tombait HORS de la page — et le seul chemin vers « apres les Colonnes »
+ * traversait les colonnes, qui grandissent sous l'apercu du bloc et gardent le
+ * pointeur. Etiree, la zone de la page recoit ce blanc : on y depose a la suite.
+ *
+ * Aucun effet sur la mesure de pagination (measure.ts lit les boites des blocs,
+ * pas celle de la zone) ni sur le PDF, ou cette enveloppe n'existe pas.
+ */
+.ed .ds-canvas-content > [data-puck-dropzone] {
+  flex-grow: 1;
+}
+
+/* ======================================================================= */
+/* Surface de page du canvas.                                              */
+/*                                                                         */
+/* La geometrie (largeurs, hauteurs, marges) est posee EN LIGNE par         */
+/* src/blocks/canvasChrome.tsx, en millimetres, parce qu'elle depend des    */
+/* reglages du template. Ne vivent ici que la decoration et les reperes.    */
+/* ======================================================================= */
+
+/*
+ * LA PILE DES PAGES.
+ *
+ * Le corps n'est plus une feuille unique : c'est une suite de surfaces, une par
+ * bloc « Page ». Le compteur vit ici — le rang d'une page est sa position dans
+ * la pile, et aucun bloc ne connait la sienne.
+ */
+.ds-canvas-stack {
+  counter-reset: ds-page;
+  display: flex;
+  flex-direction: column;
+  /* L'espace entre deux feuilles : assez pour qu'on voie qu'il y en a deux,
+     assez peu pour qu'un bloc se glisse de l'une a l'autre d'un seul geste. */
+  gap: 2.5rem;
+  /* Le BUREAU est ici, une seule fois, et non sur chaque feuille : sinon chaque
+     page imposerait a elle seule la hauteur du canvas. */
+  background: var(--desk);
+  padding: 1.25rem 1rem 5rem;
+  min-height: 100%;
+  /* Sans cela, `margin: 0 auto` sur une page plus large que le canvas rend la
+     partie gauche inatteignable au defilement. */
+  min-width: fit-content;
+}
+
+/* Empilees, les coquilles ne sont plus le bureau : elles ne portent que leur
+   feuille. Le bureau et son rembourrage vivent sur la pile. */
+.ds-canvas-stack > .ds-canvas-shell {
+  background: transparent;
+  padding: 0;
+  min-height: 0;
+}
+
+.ds-canvas-shell {
+  /*
+   * LE BUREAU, pas la feuille.
+   *
+   * Ce plan est du MOBILIER : il suit donc le theme, contrairement a la feuille
+   * qu'il porte, qui reste blanche dans les deux themes puisque la fiche
+   * s'imprime sur du blanc. Distinguer les deux est ce qui permet au papier de
+   * se lire comme du papier — mesure du detachement de la feuille sur son
+   * fond : 1,13:1 avec l'ancien gris bleute fixe, 1,31:1 en clair et 18,40:1 en
+   * sombre avec --desk.
+   */
+  background: var(--desk);
+  padding: 1.25rem 1rem 5rem;
+  min-height: 100%;
+  /* Sans cela, `margin: 0 auto` sur une page plus large que le canvas rend la
+     partie gauche inatteignable au defilement. */
+  min-width: fit-content;
+}
+
+/*
+ * La feuille — blanche dans les deux themes, c'est la regle des deux surfaces.
+ *
+ * Le liesere et l'ombre sont en noir transparent et non en gris bleute fixe :
+ * pose sur le bureau clair il se lit comme un trait fin, pose sur le bureau
+ * sombre il disparait au lieu de dessiner un halo clair autour de la page. Une
+ * couleur opaque ne pouvait pas faire les deux.
+ */
+.ds-page-sheet {
+  /* Le socle de globals.css est annule sur la feuille (all: revert-layer) ; ce
+     modele de boite etait le sien, le CSS d'impression ne couvre que les
+     descendants. Hors couche, cette declaration passe apres l'annulation. */
+  box-sizing: border-box;
+  position: relative;
+  margin: 0 auto;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.16),
+    0 2px 14px rgba(0, 0, 0, 0.1);
+  zoom: var(--ds-zoom, 1);
+}
+
+/*
+ * Numero de page — dans la marge du BUREAU, jamais sur le papier.
+ *
+ * Le rang vient d'un compteur CSS et non d'une prop : un bloc ne connait pas sa
+ * position, et la faire transiter par les metadonnees de Puck l'aurait fait
+ * retarder d'un tour de boucle a chaque ajout ou suppression.
+ */
+.ds-page-no {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+  font: 600 10px/1.6 system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* Dans la marge du BUREAU, pas sur le papier : suit le theme. */
+  color: var(--muted-foreground);
+  z-index: 4;
+}
+
+.ds-page-no::before {
+  counter-increment: ds-page;
+  content: "page " counter(ds-page);
+}
+
+/* Page conditionnelle dont le champ teste est vide pour le profil affiche :
+   elle occupe sa place dans le studio — il faut pouvoir l'editer — mais elle ne
+   sortira pas pour ce produit-la. La terre cuite du theme : le repere est sur
+   le bureau, il suit donc le theme. */
+.ds-page-no-off {
+  color: var(--primary);
+}
+
+/*
+ * « Ajouter une page » — SOUS la feuille, jamais dessus.
+ *
+ * Le bouton appartient au bureau, pas au papier : il ne doit apparaitre sur
+ * aucune fiche. Il vit donc dans .ds-canvas-shell, apres .ds-page-sheet, et
+ * suit le theme comme le reste du mobilier — a la difference des reperes poses
+ * sur la feuille, qui eux sont fixes.
+ */
+.ds-add-page {
+  margin: 0.5rem auto 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ds-add-page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* Tirets et non trait plein : ce bouton ajoute une COUPE, pas un bloc. Le
+   vocabulaire est celui des reperes de pagination du canvas. */
+.ds-add-page-btn:hover,
+.ds-add-page-btn:focus-visible {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Reference de mesure : voir measure.ts. Hors flux, invisible. */
+.ds-mm-probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100mm;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Bande reservee a une zone repetee : hachuree, car elle n'appartient pas au
+   flux du corps — Chromium y dessine header.html ou footer.html. */
+.ds-band {
+  position: relative;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--sheet-band-a) 0 6px,
+    var(--sheet-band-b) 6px 12px
+  );
+  border-top: 1px dashed var(--sheet-guide);
+  border-bottom: 1px dashed var(--sheet-guide);
+  overflow: hidden;
+}
+
+/*
+ * Bande portant le bandeau REEL, tel qu'il s'imprimera.
+ *
+ * `pointer-events: none` : ces zones s'editent dans leurs propres onglets. Un
+ * clic qui selectionnerait quelque chose ici promettrait une edition qui
+ * n'arrivera pas. L'opacite legere dit la meme chose visuellement — c'est un
+ * rappel, pas la zone de travail.
+ */
+.ds-band-live {
+  background: #fff;
+  border-top: 1px dashed var(--sheet-guide);
+  border-bottom: 1px dashed var(--sheet-guide);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ds-band-live-inner {
+  height: 100%;
+  overflow: hidden;
+}
+
+.ds-band-tag {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: var(--sheet-guide);
+  color: #fff;
+  font: 600 8px/1.6 system-ui, sans-serif;
+  padding: 0 4px;
+  border-radius: 3px 0 0 0;
+  white-space: nowrap;
+}
+
+.ds-band-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 0.5rem;
+  font: 600 9px/1.4 system-ui, sans-serif;
+  /* Resolu contre --sheet-band-b, la plus sombre des deux bandes : c'est le cas
+     defavorable, et c'est celui qu'un fond hachure impose de prendre. */
+  color: var(--sheet-band-ink);
+}
+
+/* Rubans de DEBORDEMENT. Le calque est rogné a la hauteur du contenu : les
+   rubans au-dela ne se voient donc pas, sans qu'il faille les compter. Depuis
+   que les pages sont explicites, un ruban visible ne dit plus « page 2 » mais
+   « cette page ne tient pas sur une feuille ». */
+.ds-page-markers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.ds-page-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed rgba(225, 29, 72, 0.85);
+}
+
+/* L'etiquette est POSEE SOUS le filet, et non centree sur lui : centree, elle
+   depassait de moitie du calque des que le contenu remplissait exactement une
+   page, annoncant une page 2 qui n'existait pas. Sous le filet, elle n'apparait
+   que si du contenu occupe reellement la page suivante — et elle en legende alors
+   le haut, ce qui est ce qu'elle dit. */
+.ds-page-marker-label {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: var(--sheet-mark);
+  color: #fff;
+  font: 600 9px/1.5 system-ui, sans-serif;
+  padding: 0 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* Rappel du corps, quand on edite un bandeau : situe la bande sur la page. */
+.ds-page-rest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sheet-rest);
+  color: var(--sheet-rest-ink);
+  font: 500 9px/1.4 system-ui, sans-serif;
+}
+
+.ds-marginbox-canvas {
+  outline: 1px dashed var(--sheet-guide);
+}
+
+.ds-marginbox-limit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--sheet-mark);
+  pointer-events: none;
+  z-index: 9;
+}
+
+.ds-marginbox-limit span {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: var(--sheet-mark);
+  color: #fff;
+  font: 600 9px/1.5 system-ui, sans-serif;
+  padding: 0 5px;
+  border-radius: 0 0 3px 3px;
+  white-space: nowrap;
+}
+
+/* N'a de hauteur que si le contenu du bandeau depasse la bande reservee.
+   `overflow: hidden` est ce qui rend le repere honnete : sans lui, l'etiquette
+   restait visible hors d'une boite de hauteur nulle et annoncait un depassement
+   sur un bandeau qui tenait parfaitement. Le nombre de millimetres depassants est
+   donne par la barre de mesure, qui, elle, sait compter. */
+.ds-marginbox-overflow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 8;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(225, 29, 72, 0.13) 0 5px,
+    rgba(225, 29, 72, 0.05) 5px 10px
+  );
+}
+
+.ds-marginbox-overflow span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: var(--sheet-mark);
+  color: #fff;
+  font: 600 9px/1.5 system-ui, sans-serif;
+  padding: 0 5px;
+  border-radius: 0 0 3px 0;
+  white-space: nowrap;
+}
+
+/* Bloc qui n'apparaitra pas dans le PDF : signale comme tel, et compact, car il
+   occupe a l'ecran une place que le document n'aura pas. */
+.ds-void {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px 7px;
+  border: 1px dashed var(--sheet-mark);
+  border-radius: 3px;
+  /* Fond quasi opaque et non teinte : un placeholder pose dans un panneau de la
+     couleur primaire — la disposition la plus courante — etait illisible sur un
+     fond translucide. */
+  background: rgba(255, 255, 255, 0.95);
+  color: #9f1239;
+  font: 500 10px/1.35 system-ui, sans-serif;
+}
+
+.ds-void-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  font-weight: 700;
+}
+
+.ds-void-head em {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 9px;
+  background: var(--sheet-mark);
+  color: #fff;
+  padding: 0 4px;
+  border-radius: 2px;
+}
+
+.ds-void-reason {
+  color: #b4485f;
+}
+
+/*
+ * Bloc qui SORTIRA, mais pas comme on l'attend — le cas type : du HTML depose
+ * dans un bloc de texte brut, qui s'imprime alors balises comprises.
+ *
+ * Le rendu reel reste dessous : on doit voir ce qui va sortir. La bande le
+ * surmonte, en ambre et non en rouge, parce que rien n'est casse — le document
+ * sortira, simplement pas comme voulu. Reperes fixes et non lies au theme : ils
+ * sont poses sur la feuille, qui est blanche dans les deux themes.
+ */
+.ds-warn {
+  position: relative;
+  border-left: 3px solid #a86608;
+  padding-left: 6px;
+}
+
+.ds-warn-head {
+  display: block;
+  margin-bottom: 2px;
+  font: 600 9px/1.4 system-ui, sans-serif;
+  /* 4,60:1 sur le blanc de la feuille (#a86608 sur #ffffff), calcule par la
+     formule de luminance relative de WCAG 2 — au-dessus du 4,5:1 exige pour du
+     texte courant au niveau AA. Le premier ambre essaye, #b8730a, tombait a
+     3,82:1 : plus joli, et insuffisant. */
+  color: #a86608;
+}
+
+/* Le saut de page n'est qu'une regle CSS d'impression : sans representation, il
+   etait un bloc de hauteur nulle, invisible et inselectionnable. */
+.ds-break {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 2px dashed var(--sheet-tag);
+  padding-top: 2px;
+  font: 600 9px/1.4 system-ui, sans-serif;
+  color: var(--sheet-tag);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Saut conditionnel dont le champ est vide pour le profil affiche : il occupe
+   sa place dans l'editeur — il faut pouvoir le selectionner — mais son trait
+   dit qu'il ne coupera rien. --sheet-guide et non --sheet-tag : le gris de la
+   feuille signale un repere sans effet, le bleu un repere actif. */
+.ds-break-off {
+  border-top-color: var(--sheet-guide);
+  border-top-style: dotted;
+  color: var(--sheet-guide);
+}
+
+/* Etiquettes de conteneur : discretes au repos, franches au survol. Elles sont
+   le seul moyen de selectionner un conteneur dont les slots occupent toute la
+   surface, mais une fiche en compte une dizaine et elles recouvraient le contenu
+   qu'on cherche a juger. */
+.ds-tag {
+  opacity: 0.32;
+  transition: opacity 0.1s ease-out;
+}
+
+[data-puck-component]:hover > .ds-tag {
+  opacity: 1;
+}
+
+/* Un clavier n'active jamais le survol du conteneur : sans cette regle, tabuler
+   jusqu'aux boutons Dupliquer/Supprimer les laissait a une opacite de 0,32,
+   quasi invisibles au moment precis ou on cherche a les voir. */
+.ds-tag:focus-within {
+  opacity: 1;
+}
+
+/* Boutons Dupliquer/Supprimer de l'etiquette : un retour visuel au survol et au
+   focus, meme discret, pour toute cible interactive (heuristique de Nielsen —
+   visibilite de l'etat du systeme). */
+.ds-tag-btn:hover,
+.ds-tag-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: 2px;
+}
+
+/*
+ * Supprimer un conteneur peut effacer tout ce qu'il contient : la distinction
+ * avec Dupliquer ne doit pas reposer sur la seule forme du glyphe (✕ contre ⧉),
+ * relue a 9px sans y preter attention.
+ *
+ * Fond var(--sheet-mark) : DEJA la couleur d'avertissement de cette feuille (bandes de
+ * depassement, bloc « absent du PDF » — voir plus bas), reprise ici plutot que
+ * d'en introduire une nouvelle. Verifie au contraste WCAG 2 niveau AA, critere
+ * 1.4.3 (texte courant, seuil 4,5:1) par la formule de luminance relative
+ * standard : blanc sur var(--sheet-mark) -> ~4,70:1. C'est pourquoi le survol change le
+ * FOND en var(--sheet-mark) plutot que la seule couleur du texte : un texte var(--sheet-mark) sur le
+ * bleu var(--sheet-tag) de l'etiquette ne fait que ~1,11:1, illisible.
+ */
+.ds-tag-btn-danger:hover,
+.ds-tag-btn-danger:focus-visible {
+  background: var(--sheet-mark);
+  color: #fff;
+}
+
+/* Puck impose `position: relative` en style EN LIGNE sur l'element racine de
+   chaque bloc, apres le rendu de React. Un « Element positionne » se retrouvait
+   donc dans le flux a l'ecran et hors flux dans le PDF. Seul un `!important` de
+   feuille de style reprend la main sur un style en ligne. */
+.ds-positioned {
+  position: absolute !important;
+}
+
+/*
+ * BLOC « COMPOSANT » DANS LE CANVAS (previewConfig.tsx, ComponentBlock).
+ *
+ * Le contenu montre est celui du composant, en lecture seule : il se modifie
+ * dans l'editeur du composant. Cadre pointille et etiquette a la terre cuite
+ * pour le distinguer d'un contenu propre au template — la terre cuite FIGEE
+ * (--sheet-component), puisque l'un et l'autre sont poses sur la feuille.
+ *
+ * L'ETIQUETTE EST HORS FLUX (position absolue) : en flux, elle ajoutait sa
+ * hauteur au bloc, et la mesure de bande de l'editeur (measure.ts) annoncait un
+ * pied de page plus haut que celui que le PDF imprime.
+ */
+.ds-component-block {
+  position: relative;
+  outline: 1px dashed var(--sheet-component);
+  outline-offset: 1px;
+}
+
+/*
+ * Le contenu d'un composant s'empile comme il s'imprimera.
+ *
+ * Au rendu, ses blocs PRENNENT LA PLACE du bloc Composant dans la zone
+ * (src/lib/components.ts) : ils s'espacent donc de l'espacement de cette zone.
+ * Ici, ils etaient poses bout a bout, sans aucun ecart — un composant cree
+ * depuis un template paraissait plus tasse que les blocs qu'il remplacait.
+ * `gap: inherit` fait descendre l'espacement depuis la zone de depot, qui le
+ * relaie deja de son parent (voir « La zone de depot RELAIE » plus haut).
+ *
+ * DEUX REGLES ET NON UNE LISTE DE SELECTEURS : ecrite `a:has(...), b { }` a la
+ * suite de la regle `.ds-component-block` ci-dessus, la compilation (Lightning
+ * CSS, via Next) fusionnait les deux et PERDAIT le selecteur `:has()` — constate
+ * dans la feuille servie. `min-width: 0` distingue la premiere, sans effet sur
+ * un bloc deja a pleine largeur.
+ */
+.ed [data-puck-component]:has(> .ds-component-block) {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+}
+
+.ds-component-block {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+
+.ds-component-label {
+  position: absolute;
+  top: 0;
+  /* A gauche : a droite, le bord de la feuille coupait l'etiquette. */
+  left: 0;
+  transform: translateY(-100%);
+  z-index: 2;
+  padding: 0 5px;
+  background: var(--sheet-component);
+  color: #fff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/*
+ * Bloc survole dans le panneau Calques (LayersPanel.tsx) : on montre lequel,
+ * sur la feuille. Un contour et non un fond, pour ne rien masquer du rendu ;
+ * --sheet-tag, le jeton des etiquettes de conteneur, parce qu'il est fixe —
+ * il est peint sur la feuille, qui ne suit pas le theme.
+ */
+.ed [data-puck-component].ds-layer-hover {
+  outline: 2px solid var(--sheet-tag);
+  outline-offset: -2px;
+}

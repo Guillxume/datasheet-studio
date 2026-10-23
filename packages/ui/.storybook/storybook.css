@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "../src/themes/neutral.css";
+
+/*
+ * The package's base.css excludes stories and tests from the Tailwind scan,
+ * since consuming apps never render them. Storybook does, so bring them back.
+ */
+@source "../src/**/*.stories.tsx";
+@source "../src/stories/**";

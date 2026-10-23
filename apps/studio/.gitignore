@@ -1,0 +1,30 @@
+node_modules/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# Secrets et surcharges locales
+.env
+
+# Sorties de test du pipeline de rendu
+/tmp/
+*.pdf
+
+# Dossier de sortie par defaut des collecteurs (--out), journal de reprise
+# compris : ce sont des artefacts d'execution, pas des sources.
+/pdf/
+
+# Exports de catalogue poses a la racine pour eprouver un import : ce sont des
+# donnees produit REELLES d'une boutique — des entrees de test, pas des
+# sources. Voir docs/importer-un-catalogue.md.
+/*.csv
+
+# Images de test : copiees localement depuis une boutique (logos de marques
+# tierces compris), pas versionnees. Voir README, section Demarrage local.
+fixtures/assets/
+
+# Sorties de Playwright (tests/e2e/) : rapport HTML et traces d'echec.
+/playwright-report/
+/test-results/
+/blob-report/
+AGENTS.md

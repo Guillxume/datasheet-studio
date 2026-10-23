@@ -1,0 +1,11 @@
+{
+  "name": "Contoso Equipment",
+  "url": "https://www.contoso-equipment.example",
+  "colors": { "primary": "#0b5ea8", "secondary": "#33404d" },
+  "company": {
+    "address": "1 Example Street, Springfield",
+    "phone": "+33 1 00 00 00 00",
+    "email": "contact@contoso-equipment.example",
+    "legal": "SAS au capital de 10 000 EUR — RCS Springfield"
+  }
+}

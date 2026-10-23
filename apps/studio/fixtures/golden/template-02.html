@@ -1,0 +1,201 @@
+<!-- ===== index.html ===== -->
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche</title>
+<style>:root { --color-primary: #0b5ea8; --color-secondary: #33404d; }</style>
+<style>
+html, body { margin: 0; padding: 0; }
+body {
+  
+  font-family: var(--font-body, Arial, Helvetica, sans-serif);
+  font-size: 10pt;
+  line-height: 1.4;
+  color: var(--color-text, #1a1a1a);
+
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+img { max-width: 100%; height: auto; }
+table { border-collapse: collapse; width: 100%; }
+
+/* Repeter l'en-tete d'un tableau de caracteristiques qui deborde sur
+   plusieurs pages, et ne jamais couper une ligne en deux. */
+thead { display: table-header-group; }
+tfoot { display: table-footer-group; }
+tr, li, figure { break-inside: avoid; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+
+/* Une image seule ne doit pas se retrouver orpheline en bas de page. */
+.ds-gallery, .ds-schema { break-inside: avoid; }
+
+.ds-pagebreak { break-after: page; }
+
+/* Une page commence sur une nouvelle feuille — SAUF la premiere.
+   Le selecteur de frere adjacent, et non un break-after porte par chaque
+   page : une page conditionnelle qui ne s'imprime pas n'est pas dans le
+   document, elle ne peut donc pas laisser derriere elle une coupure vers une
+   page qui n'existe plus. Et la derniere page ne produit aucune feuille
+   blanche, puisqu'elle n'a pas de suivante. */
+.ds-page + .ds-page { break-before: page; }
+
+</style>
+
+</head>
+<body>
+<div class="ds-body" style="--ds-pad-left:10mm;--ds-pad-right:12mm;--ds-block-gap:4mm;--ds-page-content:243mm;position:relative">
+<div class="ds-page" style="padding-left:var(--ds-pad-left, 12mm);padding-right:var(--ds-pad-right, 12mm);display:flex;flex-direction:column;gap:var(--ds-block-gap, 4mm);position:relative;min-height:var(--ds-page-content, 243mm)">
+<h1 style="font-size:20pt;text-align:center;color:#111111;text-transform:uppercase;text-decoration:underline;box-sizing:border-box;margin:0">Transpalette manuel 2500 kg fourches longues</h1>
+<div style="display:flex;gap:4mm;justify-content:center;align-items:center;box-sizing:border-box">
+<img src="data:image/png;base64,<d508ca3e70a8>" alt="CARSAT" style="height:18mm;width:auto"/>
+</div>
+<div style="height:3mm;position:relative">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1.5fr 0.75fr;gap:4mm;align-items:start;position:relative">
+<div style="display:flex;flex-direction:column;gap:4mm">
+<div class="ds-gallery" style="display:grid;grid-template-columns:repeat(2, 1fr);gap:2mm">
+<img src="data:image/svg+xml;base64,<5cff97aff31f>" alt="Détail du timon" style="width:100%;object-fit:contain;border:1pt solid var(--color-primary);padding:1mm;box-sizing:border-box"/>
+<img src="data:image/svg+xml;base64,<c2e51753ffd6>" alt="Galets tandem" style="width:100%;object-fit:contain;border:1pt solid var(--color-primary);padding:1mm;box-sizing:border-box"/>
+<img src="data:image/svg+xml;base64,<121840f67ce7>" alt="Pompe hydraulique" style="width:100%;object-fit:contain;border:1pt solid var(--color-primary);padding:1mm;box-sizing:border-box"/>
+<img src="data:image/svg+xml;base64,<135f38cde6bd>" alt="Plaque de charge" style="width:100%;object-fit:contain;border:1pt solid var(--color-primary);padding:1mm;box-sizing:border-box"/>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:4mm">
+<div class="ds-gallery" style="display:grid;grid-template-columns:repeat(1, 1fr);gap:0mm">
+<img src="data:image/svg+xml;base64,<84260a55b710>" alt="Vue trois quarts" style="width:100%;object-fit:contain;box-sizing:border-box"/>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:4mm">
+<div style="width:100%;box-sizing:border-box;background-color:var(--color-primary);background-repeat:no-repeat;color:#ffffff;padding:2mm;text-align:center;position:relative">
+<div style="width:100%;display:flex;flex-direction:column;gap:4mm">
+<p style="font-size:8pt;text-align:center;font-weight:400;color:#ffffff;box-sizing:border-box;margin:0;white-space:pre-line">Produit en ligne</p>
+<div style="display:flex;flex-direction:column;align-items:center">
+<img src="data:image/svg+xml,<8a801831e482>" alt="" style="width:18mm;height:18mm"/>
+</div>
+<div style="height:2mm;position:relative">
+</div>
+<div style="display:flex;gap:2mm;justify-content:center;align-items:center;box-sizing:border-box">
+<img src="data:image/png;base64,<315ee4fb4880>" alt="Garantie 3 ans" style="height:14mm;width:auto"/>
+</div>
+<div style="height:2mm;position:relative">
+</div>
+<div style="display:flex;gap:2mm;justify-content:center;align-items:center;box-sizing:border-box">
+<img src="data:image/png;base64,<3f7027c7557f>" alt="Certificat" style="height:14mm;width:auto"/>
+<img src="data:image/png;base64,<4178ed6a0bbb>" alt="Manuel" style="height:14mm;width:auto"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div style="height:4mm;position:relative">
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5mm;align-items:start;position:relative">
+<div style="display:flex;flex-direction:column;gap:4mm">
+<div style="font-size:9pt">
+<table style="table-layout:auto">
+<tbody>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);font-weight:700">Capacité de charge</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);white-space:pre-line">2500 kg (Q)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;font-weight:700">Longueur des fourches</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;white-space:pre-line">1150 mm (L)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);font-weight:700">Largeur hors fourches</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);white-space:pre-line">540 mm (B)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;font-weight:700">Hauteur de levée</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;white-space:pre-line">200 mm (H)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);font-weight:700">Hauteur mini d&#x27;entrée</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);white-space:pre-line">85 mm (h)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;font-weight:700">Roues directrices</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;white-space:pre-line">Polyuréthane 200 x 50 mm (D)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);font-weight:700">Galets</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);white-space:pre-line">Nylon tandem 74 x 70 mm (d)</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;font-weight:700">Poids net</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;white-space:pre-line">78 kg</td>
+</tr>
+<tr>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);font-weight:700">Norme de conformité</td>
+<td style="padding:1.2mm 2mm;vertical-align:top;background-color:color-mix(in srgb, currentColor 14%, transparent);white-space:pre-line">EN ISO 3691-5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:4mm">
+<div class="ds-schema" style="display:flex;justify-content:center">
+<img src="data:image/svg+xml;base64,<f236b350a74c>" alt="" style="width:100%;object-fit:contain"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
+<!-- ===== header.html ===== -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+:root { --color-primary: #0b5ea8; --color-secondary: #33404d; }
+html, body { margin: 0; padding: 0; width: 100%; }
+body { font-family: var(--font-body, Arial, Helvetica, sans-serif); font-size: 8pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ds-marginbox { width: 100%; box-sizing: border-box; padding: 0 0mm 0 0mm; }
+img { display: block; }
+</style>
+</head>
+<body>
+<div class="ds-marginbox">
+<div style="width:100%;box-sizing:border-box;height:26mm;background-color:var(--color-primary);background-size:cover;background-position:center;color:#ffffff;display:flex;align-items:center;justify-content:space-between;padding:0 8mm">
+<div style="min-width:0">
+<div style="font-size:13pt;font-weight:700;line-height:1.15">Transpalette manuel 2500 kg fourches longues</div>
+<div style="font-size:8pt;opacity:0.9">Ref. TPM-2500-L</div>
+</div>
+<img src="data:image/svg+xml;base64,<fb8a2ea9f87d>" alt="" style="height:11mm;width:auto"/>
+</div>
+</div>
+</body>
+</html>
+<!-- ===== footer.html ===== -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+:root { --color-primary: #0b5ea8; --color-secondary: #33404d; }
+html, body { margin: 0; padding: 0; width: 100%; }
+body { font-family: var(--font-body, Arial, Helvetica, sans-serif); font-size: 8pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ds-marginbox { width: 100%; box-sizing: border-box; padding: 0 0mm 0 0mm; }
+img { display: block; }
+</style>
+</head>
+<body>
+<div class="ds-marginbox">
+<div style="width:100%;box-sizing:border-box;height:16mm;background-color:var(--color-secondary);background-size:cover;background-position:center;background-repeat:no-repeat;color:#ffffff;display:flex;align-items:center;justify-content:space-between;gap:4mm;padding:0 8mm;font-size:7.5pt">
+<span>1 Example Street, Springfield</span>
+<span>+33 1 00 00 00 00 - contact@exemple.test</span>
+<span>
+<span class="pageNumber">
+</span> / <span class="totalPages">
+</span>
+</span>
+</div>
+</div>
+</body>
+</html>

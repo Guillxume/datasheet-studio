@@ -1,0 +1,155 @@
+# Datasheet Studio — local demo, one command:
+#
+#   docker compose up --build
+#
+# then open http://localhost:3000 and sign in with the demo account printed by
+# the `setup` service (admin@example.com / studio-demo-2026 by default).
+#
+# Everything here is for a LOCAL demo: fixed demo credentials, plain HTTP,
+# nothing published beyond 127.0.0.1. Do not expose this stack as is.
+#
+# Services
+#   db         Postgres, not published.
+#   gotenberg  Chromium that turns the datasheet HTML into PDF. Isolated on a
+#              network without egress, JavaScript disabled, file:// only.
+#   mailpit    catches activation / reset emails (web UI on MAIL_UI_PORT).
+#   setup      one-shot: migrations, demo shop, templates, demo account.
+#              Idempotent — `up` twice changes nothing.
+#   app        the Studio (Next.js standalone build).
+#   samples    one-shot: renders a few demo datasheets through the public API,
+#              so the render log and the datasheet index are not empty.
+#
+# Variables (all optional): STUDIO_PORT (3000), MAIL_UI_PORT (8025),
+# DEMO_EMAIL, DEMO_PASSWORD, DEMO_API_KEY.
+
+name: datasheet-studio
+
+x-studio-env: &studio-env
+  DATABASE_URL: "postgres://studio:studio@db:5432/datasheet_studio"
+  GOTENBERG_URL: "http://gotenberg:3000"
+  STUDIO_PUBLIC_URL: "http://localhost:${STUDIO_PORT:-3000}"
+  # Plain HTTP on localhost: a `secure` cookie would be accepted and never sent
+  # back, and the login page would loop without an error message.
+  COOKIE_SECURE: "false"
+  MAIL_TRANSPORT: "smtp"
+  MAIL_HOST: "mailpit"
+  MAIL_PORT: "1025"
+  MAIL_SECURE: "false"
+  MAIL_FROM: "Datasheet Studio <no-reply@studio.localhost>"
+  PWNED_PASSWORDS: "on"
+  TZ: "Europe/Paris"
+
+x-demo-env: &demo-env
+  DEMO_EMAIL: "${DEMO_EMAIL:-admin@example.com}"
+  DEMO_PASSWORD: "${DEMO_PASSWORD:-studio-demo-2026}"
+  # Demo-only API key for the "Contoso Equipment" shop (format sk_<12 hex>_<secret>).
+  DEMO_API_KEY: "${DEMO_API_KEY:-sk_000000000000_local-demo-key-not-a-secret}"
+
+x-tools: &tools
+  image: datasheet-studio-tools
+  build:
+    context: .
+    dockerfile: apps/studio/infra/config/app/Dockerfile
+    target: tools
+  networks: [internal]
+  restart: "no"
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: datasheet_studio
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      TZ: "Europe/Paris"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d datasheet_studio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    # ONLY on the `rendu` network, which has no egress (internal: true) and only
+    # links it to the app. The app downloads remote images itself (with an SSRF
+    # guard) and attaches them; Chromium never needs the network.
+    networks: [rendu]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    command:
+      - "gotenberg"
+      # No rendering needs JavaScript: the HTML is static markup produced
+      # server-side. Leaving it on would only help an injected <script>.
+      - "--chromium-disable-javascript=true"
+      # Only the files attached to the multipart request are readable.
+      - "--chromium-allow-list=^file:///tmp/.*"
+      - "--api-timeout=90s"
+
+  mailpit:
+    image: axllent/mailpit
+    networks: [internal]
+    ports:
+      - "127.0.0.1:${MAIL_UI_PORT:-8025}:8025"
+
+  setup:
+    <<: *tools
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: [*studio-env, *demo-env]
+    command:
+      - "sh"
+      - "-c"
+      - "tsx scripts/migrate.ts && tsx scripts/seed.ts && tsx scripts/demo-setup.ts"
+
+  app:
+    image: datasheet-studio-app
+    build:
+      context: .
+      dockerfile: apps/studio/infra/config/app/Dockerfile
+      target: app
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      gotenberg:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    environment:
+      <<: *studio-env
+    ports:
+      - "127.0.0.1:${STUDIO_PORT:-3000}:3000"
+    networks: [internal, rendu]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    # The probe goes through the app AND the database (src/app/api/health).
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  samples:
+    <<: *tools
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      <<: *demo-env
+      STUDIO_URL: "http://app:3000"
+    command: ["tsx", "scripts/demo-samples.ts"]
+
+volumes:
+  db-data:
+
+networks:
+  internal:
+  # The app and Gotenberg, nothing else, and NO EGRESS: a container that is only
+  # on this network reaches neither the Internet, nor the host, nor the database.
+  rendu:
+    internal: true
